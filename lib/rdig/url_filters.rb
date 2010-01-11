@@ -1,5 +1,5 @@
 module RDig
-  
+
   module UrlFilters
 
     class FilterChain
@@ -75,7 +75,7 @@ module RDig
       # nil otherwise
       def apply(document)
         synchronize do
-          @visited_urls.add?(document.uri.to_s) ? document : nil 
+          @visited_urls.add?(document.uri.to_s) ? document : nil
         end
       end
     end
@@ -97,7 +97,7 @@ module RDig
         unless args.nil?
           @patterns = []
           if args.respond_to? :each
-            args.each { |pattern| 
+            args.each { |pattern|
               # cloning because unsure if regexps are thread safe ?
               @patterns << pattern #.clone
             }
@@ -174,7 +174,7 @@ module RDig
       uri.host = ref.host unless uri.host
       uri.port = ref.port unless uri.port || ref.port==ref.default_port
       uri.path = ref.path unless uri.path
-      
+
       old_uri_path = uri.path
       if uri.path !~ /^\// || uri.path =~ /^\.\./
         ref_path = ref.path || '/'

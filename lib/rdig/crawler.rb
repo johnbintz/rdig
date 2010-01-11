@@ -1,8 +1,8 @@
 module RDig
-  
-  
+
+
   class Crawler
-    
+
     def initialize(config = RDig.config, logger = RDig.logger)
       @documents = Queue.new
       @logger = logger
@@ -37,9 +37,9 @@ module RDig
         }
       }
 
-      # check for an empty queue every now and then 
+      # check for an empty queue every now and then
       sleep_interval = @config.crawler.wait_before_leave
-      begin 
+      begin
         sleep sleep_interval
       end until @documents.empty?
       # nothing to do any more, tell the threads to exit
@@ -56,11 +56,11 @@ module RDig
       when :success
         if @etag_filter.apply(doc)
           # add links from this document to the queue
-          doc.content[:links].each { |url| 
-            add_url(url, filterchain, doc) 
+          doc.content[:links].each { |url|
+            add_url(url, filterchain, doc)
           } unless doc.content[:links].nil?
           add_to_index doc
-        end        
+        end
       when :redirect
         @logger.debug "redirect to #{doc.content}"
         add_url(doc.content, filterchain, doc)
@@ -76,8 +76,8 @@ module RDig
       @indexer << doc if doc.needs_indexing?
     end
 
-    
-    # pipes a new document pointing to url through the filter chain, 
+
+    # pipes a new document pointing to url through the filter chain,
     # if it survives that, it gets added to the documents queue for further
     # processing
     def add_url(url, filterchain, referring_document = nil)
@@ -91,7 +91,7 @@ module RDig
       end
 
       doc = filterchain.apply(doc)
-        
+
       if doc
         @documents << doc
         @logger.debug "url #{url} survived filterchain"
@@ -99,14 +99,14 @@ module RDig
     rescue
       nil
     end
-    
+
   end
 
-  
+
   # checks fetched documents' E-Tag headers against the list of E-Tags
   # of the documents already indexed.
-  # This is supposed to help against double-indexing documents which can 
-  # be reached via different URLs (think http://host.com/ and 
+  # This is supposed to help against double-indexing documents which can
+  # be reached via different URLs (think http://host.com/ and
   # http://host.com/index.html )
   # Documents without ETag are allowed to pass through
   class ETagFilter
@@ -120,7 +120,7 @@ module RDig
     def apply(document)
       return document unless (document.respond_to?(:etag) && document.etag && !document.etag.empty?)
       synchronize do
-        @etags.add?(document.etag) ? document : nil 
+        @etags.add?(document.etag) ? document : nil
       end
     end
   end

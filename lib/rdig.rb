@@ -2,7 +2,7 @@
 
 #--
 # Copyright (c) 2006 Jens Kraemer
-# 
+#
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
 # "Software"), to deal in the Software without restriction, including
@@ -10,10 +10,10 @@
 # distribute, sublicense, and/or sell copies of the Software, and to
 # permit persons to whom the Software is furnished to do so, subject to
 # the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be
 # included in all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 # EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
@@ -84,7 +84,7 @@ module RDig
           { RDig::UrlFilters::PathExclusionFilter => :exclude_documents }
         ]
       }
-         
+
     end
 
     def application
@@ -130,7 +130,7 @@ module RDig
             # settings for html content extraction (hpricot)
             :hpricot      => OpenStruct.new(
               # css selector for the element containing the page title
-              :title_tag_selector => 'title', 
+              :title_tag_selector => 'title',
               # might also be a proc returning either an element or a string:
               # :title_tag_selector => lambda { |hpricot_doc| ... }
               :content_tag_selector => 'body'
@@ -138,8 +138,8 @@ module RDig
               # :content_tag_selector => lambda { |hpricot_doc| ... }
             )
           ),
-          :index                 => OpenStruct.new( 
-            :path                => "index/", 
+          :index                 => OpenStruct.new(
+            :path                => "index/",
             :create              => true,
             :handle_parse_errors => true,
             :analyzer            => Ferret::Analysis::StandardAnalyzer.new,
@@ -150,7 +150,7 @@ module RDig
       end
     end
     alias config configuration
-    
+
     def logger
       @logger ||= create_logger
     end
@@ -200,12 +200,12 @@ module RDig
     def options
       @options ||= OpenStruct.new
     end
-    
+
     # Display the program usage line.
     def usage
       puts "rdig -c configfile {options}"
     end
-    
+
     # Display the rake command line help.
     def help
       usage
@@ -243,7 +243,7 @@ module RDig
         exit
       else
         fail "Unknown option: #{opt}"
-      end 
+      end
     end
 
     # Read and handle the command line options.
@@ -266,8 +266,8 @@ module RDig
       rescue
         puts $!.backtrace
         fail "No Configfile found!\n#{$!}"
-        
-      end    
+
+      end
 
       puts "using Ferret #{Ferret::VERSION}"
 
