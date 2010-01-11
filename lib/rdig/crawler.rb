@@ -22,6 +22,18 @@ module RDig
       url_type = @config.crawler.start_urls.first =~ /^file:\/\// ? :file : :http
       chain_config = RDig.filter_chain[url_type]
 
+      @config.crawler.start_urls.each do |url|
+        begin
+          uri = URI.parse(url)
+          if uri.scheme == 'http'
+            if !@config.crawler.include_hosts.index(uri.host)
+              @config.crawler.include_hosts << uri.host
+            end
+          end
+        rescue
+        end
+      end
+
       @etag_filter = ETagFilter.new
       filterchain = UrlFilters::FilterChain.new(chain_config)
       @config.crawler.start_urls.each { |url| add_url(url, filterchain) }
