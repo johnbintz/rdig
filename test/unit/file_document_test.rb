@@ -10,7 +10,7 @@ class FileDocumentTest < Test::Unit::TestCase
     links = FileDocument.find_files(@fixture_path)
     assert_equal 3, links.size
     links = FileDocument.find_files("#{@fixture_path}/html")
-    assert_equal 3, links.size
+    assert_equal 5, links.size
   end
 
   def test_fetch_directory
