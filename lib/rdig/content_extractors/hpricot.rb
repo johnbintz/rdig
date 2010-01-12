@@ -6,7 +6,7 @@ rescue LoadError
   require 'hpricot'
   require 'htmlentities'
 end
-  
+
 module RDig
   module ContentExtractors
 
@@ -16,17 +16,17 @@ module RDig
       def initialize(config)
         super(config.hpricot)
         # if not configured, refuse to handle any content:
-        @pattern = /^(text\/(html|xml)|application\/(xhtml\+xml|xml))/ if config.hpricot 
+        @pattern = /^(text\/(html|xml)|application\/(xhtml\+xml|xml))/ if config.hpricot
       end
 
-      # returns: 
+      # returns:
       # { :content => 'extracted clear text',
       #   :title => 'Title',
       #   :links => [array of urls] }
       def process(content)
         entities = HTMLEntities.new
         doc = Hpricot(content)
-        { 
+        {
           :title => entities.decode(extract_title(doc)).strip,
           :links => extract_links(doc),
           :content => entities.decode(extract_content(doc))
@@ -35,7 +35,7 @@ module RDig
 
       # Extracts textual content from the HTML tree.
       #
-      # - First, the root element to use is determined using the 
+      # - First, the root element to use is determined using the
       # +content_element+ method, which itself uses the content_tag_selector
       # from RDig.configuration.
       # - Then, this element is processed by +extract_text+, which will give
@@ -49,7 +49,7 @@ module RDig
         return ''
       end
 
-      # extracts the href attributes of all a tags, except 
+      # extracts the href attributes of all a tags, except
       # internal links like <a href="#top">
       def extract_links(doc)
         {'a' => 'href', 'area' => 'href', 'frame' => 'src'}.map do |tag, attr|
@@ -59,7 +59,7 @@ module RDig
           end
         end.flatten.compact
       end
-      
+
       # Extracts the title from the given html tree
       def extract_title(doc)
         the_title_tag = title_tag(doc)
@@ -89,9 +89,9 @@ module RDig
       def strip_comments(string)
         string.gsub Regexp.new('<!--.*?-->', Regexp::MULTILINE, 'u'), ''
       end
-      
+
       def strip_tags(string)
-        string.gsub! Regexp.new('<(script|style).*?>.*?<\/(script|style).*?>', 
+        string.gsub! Regexp.new('<(script|style).*?>.*?<\/(script|style).*?>',
                                Regexp::MULTILINE, 'u'), ''
         string.gsub! Regexp.new('<.+?>',
                                Regexp::MULTILINE, 'u'), ''
