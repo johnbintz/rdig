@@ -52,6 +52,8 @@ module RDig
   # Document in a File system
   #
   class FileDocument < Document
+    attr_reader :status
+
     def initialize(args={})
       super(args)
     end
@@ -76,6 +78,7 @@ module RDig
     end
 
     def fetch
+      @status = :success
       if File.directory? @uri.path
         # directories are treated like a link collection
         @content = { :links => self.class.find_files(@uri.path) }
