@@ -6,10 +6,18 @@ module RDig
 
       def initialize(settings)
         @config = settings
+
+        field_infos = Ferret::Index::FieldInfos.new
+
+        @config.weightings.each do |field, weight|
+          field_infos.add_field field, :boost => weight
+        end
+
         @index_writer = Ferret::Index::IndexWriter.new(
                           :path     => settings.path,
                           :create   => settings.create,
-                          :analyzer => settings.analyzer)
+                          :analyzer => settings.analyzer,
+                          :field_infos => field_infos)
         super() # scary, MonitorMixin won't initialize if we don't call super() here (parens matter)
       end
 
