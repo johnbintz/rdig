@@ -7,17 +7,24 @@ module RDig
       def initialize(settings)
         @config = settings
 
+        @url_popularity = {}
+
         field_infos = Ferret::Index::FieldInfos.new
 
         @config.weightings.each do |field, weight|
           field_infos.add_field field, :boost => weight
         end
 
-        @index_writer = Ferret::Index::IndexWriter.new(
-                          :path     => settings.path,
-                          :create   => settings.create,
-                          :analyzer => settings.analyzer,
-                          :field_infos => field_infos)
+        index_writer_options = {
+          :path     => settings.path,
+          :create   => settings.create,
+          :analyzer => settings.analyzer,
+          :field_infos => field_infos,
+          :id_field => :url,
+          :key => :url
+        }
+
+        @index = Ferret::Index::Index.new(index_writer_options)
         super() # scary, MonitorMixin won't initialize if we don't call super() here (parens matter)
       end
 
@@ -29,20 +36,50 @@ module RDig
           :url   => document.uri.to_s
         }
 
+        document.links.each do |link|
+          if !@url_popularity[link]
+            @url_popularity[link] = 0
+          end
+
+          @url_popularity[link] += 1
+        end
+
         @config.fields.each do |field|
           doc[field] = document.content[field]
         end
 
         synchronize do
-          @index_writer << doc
+          @index << doc
         end
       end
       alias :<< :add_to_index
 
       def close
-        @index_writer.optimize
-        @index_writer.close
-        @index_writer = nil
+        synchronize do
+          (0...@index.size()).each do |i|
+            doc = @index[i].load
+            total_boost = 0
+            @url_popularity.each do |link, boost|
+              if doc[:url][link]
+                total_boost += boost
+              end
+            end
+
+            if total_boost > 0
+              d = Ferret::Document.new(total_boost)
+              doc.keys.each do |k|
+                d[k] = doc[k]
+              end
+
+              @index.delete i
+              @index << d
+            end
+          end
+        end
+
+        @index.optimize
+        @index.close
+        @index = nil
       end
     end
 
