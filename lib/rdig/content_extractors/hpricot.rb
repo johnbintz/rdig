@@ -19,34 +19,32 @@ module RDig
         @pattern = /^(text\/(html|xml)|application\/(xhtml\+xml|xml))/ if config.hpricot
       end
 
-      # returns:
-      # { :content => 'extracted clear text',
-      #   :title => 'Title',
-      #   :links => [array of urls] }
       def process(content)
-        entities = HTMLEntities.new
         doc = Hpricot(content)
-        {
-          :title => entities.decode(extract_title(doc)).strip,
-          :links => extract_links(doc),
-          :content => entities.decode(extract_content(doc))
-        }
-      end
 
-      # Extracts textual content from the HTML tree.
-      #
-      # - First, the root element to use is determined using the
-      # +content_element+ method, which itself uses the content_tag_selector
-      # from RDig.configuration.
-      # - Then, this element is processed by +extract_text+, which will give
-      # all textual content contained in the root element and all it's
-      # children.
-      def extract_content(doc)
-        if ce = content_element(doc)
-          return strip_tags(strip_comments(ce.inner_html))
+        ret = {}
+
+        @config.methods.collect { |m| if m[/_tag_selector$/]; [ m, m.to_s.gsub('_tag_selector', '') ]; end }.compact.each do |method, tag|
+          value = tag_from_config(doc, method)
+          if value
+            post_process_method = "post_process_#{tag}".to_sym
+            if respond_to? post_process_method
+              value = send(post_process_method, value)
+            end
+
+            if value.respond_to? :to_html
+              value = value.to_html
+            end
+            ret[tag.to_sym] = value
+          end
         end
-          # return (ce.inner_text || '').gsub(Regexp.new('\s+', Regexp::MULTILINE, 'u'), ' ').strip
-        return ''
+
+        methods.find_all { |m| m[/^extract_/] }.each do |method|
+          tag = method.gsub('extract_', '').to_sym
+          ret[tag] = send(method.to_sym, doc)
+        end
+
+        ret
       end
 
       # extracts the href attributes of all a tags, except
@@ -60,24 +58,22 @@ module RDig
         end.flatten.compact
       end
 
-      # Extracts the title from the given html tree
-      def extract_title(doc)
-        the_title_tag = title_tag(doc)
-        return the_title_tag unless the_title_tag.respond_to? :inner_html
-        strip_tags(the_title_tag.inner_html)
+      # post process title elements
+      def post_process_title(title)
+        if title.respond_to? :inner_html
+          title = title.inner_html
+        end
+
+        HTMLEntities.new.decode(strip_tags(title)).strip
       end
 
-      # Returns the element to extract the title from.
-      #
-      # This may return a string, e.g. an attribute value selected from a meta
-      # tag, too.
-      def title_tag(doc)
-        tag_from_config(doc, :title_tag_selector) || doc.at('title')
-      end
+      # post process content elements
+      def post_process_content(content)
+        if content.respond_to? :inner_html
+          content = content.inner_html
+        end
 
-      # Retrieve the root element to extract document content from
-      def content_element(doc)
-        tag_from_config(doc, :content_tag_selector) || doc.at('body')
+        HTMLEntities.new.decode(strip_tags(content))
       end
 
       def tag_from_config(doc, config_key)
