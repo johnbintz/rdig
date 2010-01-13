@@ -1,6 +1,5 @@
 module RDig
   module Index
-
     # used by the crawler to build the ferret index
     class Indexer
       include MonitorMixin
@@ -19,10 +18,13 @@ module RDig
         @config.rewrite_uri.call(document.uri) if @config.rewrite_uri
         # all stored and tokenized, should be ferret defaults
         doc = {
-          :url   => document.uri.to_s,
-          :title => document.title,
-          :data  => document.body
+          :url   => document.uri.to_s
         }
+
+        @config.fields.each do |field|
+          doc[field] = document.content[field]
+        end
+
         synchronize do
           @index_writer << doc
         end

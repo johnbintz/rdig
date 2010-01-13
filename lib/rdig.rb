@@ -144,7 +144,8 @@ module RDig
             :handle_parse_errors => true,
             :analyzer            => Ferret::Analysis::StandardAnalyzer.new,
             :occur_default       => :must,
-            :default_field       => '*'
+            :default_field       => '*',
+            :fields              => [ :title, :content ]
           )
         )
       end

@@ -44,7 +44,6 @@ module RDig
     def to_s
       "#{self.class.name}, uri=#{uri}, title=#{has_content? ? title : 'not loaded yet'}"
     end
-
   end
 
 
