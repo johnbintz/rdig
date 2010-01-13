@@ -16,7 +16,7 @@ class HpricotContentExtractorTest < Test::Unit::TestCase
     assert @extractor.can_do('application/xml')
     assert @extractor.can_do('application/xhtml+xml')
   end
- 
+
   def test_simple
     result = ContentExtractors.process(html_doc('simple'), 'text/html')
     assert_not_nil result
@@ -52,20 +52,20 @@ class HpricotContentExtractorTest < Test::Unit::TestCase
     assert_equal '/inside.html', result[:links][1]
     assert_equal '/footer.html', result[:links][2]
   end
-  
+
   def test_extracts_links_from_frameset
     result = @extractor.process(html_doc('frameset'))
     assert_equal 'http://test.host/first.html', result[:links].first
     assert_equal '/second.html', result[:links].last
   end
-  
+
   def test_extracts_links_from_imagemap
     result = @extractor.process(html_doc('imagemap'))
     assert_equal 'http://test.host/first.html', result[:links].first
     assert_equal '/second.html', result[:links].last
   end
 
-  
+
   def test_title_from_dcmeta
     @config.title_tag_selector = lambda do |doc|
       doc.at("meta[@name='DC.title']")['content']
@@ -73,7 +73,7 @@ class HpricotContentExtractorTest < Test::Unit::TestCase
     result = @extractor.process(html_doc('custom_tag_selectors'))
     assert_equal 'Title from DC meta data', result[:title]
   end
-  
+
   def test_preprocessed_title
     @config.title_tag_selector = lambda do |doc|
       title = doc.at("meta[@name='DC.title']")['content']
@@ -84,6 +84,4 @@ class HpricotContentExtractorTest < Test::Unit::TestCase
     result = @extractor.process(html_doc('custom_tag_selectors'))
     assert_equal 'Title from DC', result[:title]
   end
-  
 end
-

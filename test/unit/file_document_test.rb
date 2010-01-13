@@ -28,7 +28,7 @@ class FileDocumentTest < Test::Unit::TestCase
     assert file.needs_indexing?
     assert_equal 'This is for testing PDF extraction. Some Ümläuts and a €uro. Another Paragraph.', file.body
   end
-  
+
 end
 
 

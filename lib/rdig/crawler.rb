@@ -1,8 +1,5 @@
 module RDig
-
-
   class Crawler
-
     def initialize(config = RDig.config, logger = RDig.logger)
       @documents = Queue.new
       @logger = logger
@@ -136,5 +133,4 @@ module RDig
       end
     end
   end
-
 end
