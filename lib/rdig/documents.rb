@@ -106,6 +106,15 @@ module RDig
     attr_reader :etag
 
     def create_child(uri)
+      begin
+        new_uri = URI.parse(uri)
+        if !new_uri.host
+          mod_uri = self.uri.dup
+          mod_uri.path = new_uri.path
+          uri = mod_uri.to_s
+        end
+      rescue
+      end
       HttpDocument.new(:uri => uri, :referrer => self.uri, :depth => self.depth+1) unless uri =~ /^file:\/\//i
     end
 

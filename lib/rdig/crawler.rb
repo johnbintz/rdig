@@ -4,6 +4,7 @@ module RDig
       @documents = Queue.new
       @logger = logger
       @config = config
+      @urls_crawled = []
     end
 
     def run
@@ -92,25 +93,71 @@ module RDig
     def add_url(url, filterchain, referring_document = nil)
       return if url.nil? || url.empty?
 
-      @logger.debug "add_url #{url}"
-      doc = if referring_document
-        referring_document.create_child(url)
-      else
-        Document.create(url)
-      end
+      url = follow_redirects(url)
 
-      doc = filterchain.apply(doc)
+      if !@urls_crawled.index(url)
+        begin
+          @logger.debug "add_url #{url}"
+          doc = if referring_document
+            referring_document.create_child(url)
+          else
+            Document.create(url)
+          end
 
-      if doc
-        @documents << doc
-        @logger.debug "url #{url} survived filterchain"
+          if doc.uri.scheme = 'http'
+            if url_in_included_hosts(doc.uri.to_s)
+              doc = filterchain.apply(doc)
+
+              if doc
+                @documents << doc
+                @logger.debug "url #{url} survived filterchain"
+              end
+            end
+          end
+        rescue
+        end
+        @urls_crawled << url
       end
-    rescue
-      nil
     end
 
-  end
+    def follow_redirects(url)
+      begin
+        uri = URI.parse(url)
+        if uri.host && (uri.schema == 'http')
+          h = Net::HTTP.new(uri.host)
 
+          5.times do |i|
+            headers = h.get(url)
+            if headers['location']
+              @logger.debug "redirecting to #{headers['location']}"
+              url = headers['location']
+
+              if !url_in_included_hosts(url)
+                break
+              end
+            else
+              break
+            end
+          end
+        end
+        rescue
+      end
+
+      url
+    end
+
+    def url_in_included_hosts(url)
+      ok = false
+      begin
+        uri = URI.parse(url)
+        if @config.crawler.include_hosts.index(uri.host)
+          ok = true
+        end
+      rescue
+      end
+      ok
+    end
+  end
 
   # checks fetched documents' E-Tag headers against the list of E-Tags
   # of the documents already indexed.
