@@ -1,4 +1,6 @@
 require 'test_helper'
+require 'mocha'
+
 class SearcherTest < Test::Unit::TestCase
   include TestHelper
 
@@ -30,5 +32,21 @@ class SearcherTest < Test::Unit::TestCase
     result = RDig.searcher.search 'some sample text'
     assert_equal 5, result[:hitcount]
     assert_equal 5, result[:list].size
+  end
+
+  def test_reopen_ferret_searcher
+    mock = Class.new do
+      def reader
+        Class.new do
+          def latest?; false; end
+        end.new
+      end
+    end.new
+
+    mock.expects(:close)
+
+    RDig.searcher.instance_variable_set(:@ferret_searcher, mock)
+
+    assert_not_equal RDig.searcher.ferret_searcher, mock
   end
 end
