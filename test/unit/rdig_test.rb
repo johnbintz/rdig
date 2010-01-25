@@ -33,6 +33,21 @@ class RDigTest < Test::Unit::TestCase
     assert_equal 'http://proxy.com:8080', RDig.open_uri_http_options[:proxy]
     assert_equal "Basic dXNlcm5hbWU6cGFzc3dvcmQ=\n", RDig.open_uri_http_options['Authorization']
   end
+
+  def test_logger_equals
+    RDig.logger = "this is a logger"
+    assert_equal "this is a logger", RDig.instance_variable_get(:@logger)
+    RDig.logger = nil
+    assert_not_equal "this is a logger", RDig.instance_variable_get(:@logger)
+  end
+
+  def test_options
+    RDig.application.instance_variable_set(:@options, 'options')
+    assert_equal 'options', RDig.application.options
+  end
+
+  def test_usage
+    RDig.application.expects(:puts)
+    RDig.application.usage
+  end
 end
-
-
