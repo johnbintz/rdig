@@ -24,13 +24,13 @@ module RDig
         begin
           uri = URI.parse(url)
           if uri.scheme == 'http'
-            if !@config.crawler.include_hosts.index(uri.host)
-              @config.crawler.include_hosts << uri.host
-            end
+            @config.crawler.include_hosts << uri.host
           end
         rescue
         end
       end
+
+      @config.crawler.include_hosts.uniq!
 
       @etag_filter = ETagFilter.new
       filterchain = UrlFilters::FilterChain.new(chain_config)
