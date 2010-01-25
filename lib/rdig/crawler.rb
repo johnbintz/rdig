@@ -91,6 +91,9 @@ module RDig
     # if it survives that, it gets added to the documents queue for further
     # processing
     def add_url(url, filterchain, referring_document = nil)
+      if url.kind_of? URI
+        url = url.to_s
+      end
       return if url.nil? || url.empty?
 
       url = follow_redirects(url)
