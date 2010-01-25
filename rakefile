@@ -61,6 +61,7 @@ task :default => [ :test_all ]
 task :ta => :test_all
 task :tf => :test_functional
 task :tu => :test_units
+task :tc => :test_coverage
 
 # Run all tests
 Rake::TestTask.new("test_all") { |t|
@@ -89,7 +90,14 @@ Rake::TestTask.new("test_functional") { |t|
   t.verbose = true
 }
 
-
+desc 'Run code coverage tests'
+task :test_coverage do
+  rm_f 'coverage'
+  rm_f 'coverage.data'
+  rcov = "rcov -Ilib:test"
+  system("#{rcov} --html test/unit/*_test.rb")
+  system("open coverage/index.html") if PLATFORM['dawrin']
+end
 
 # Generate the RDoc documentation ----------------------------------------
 

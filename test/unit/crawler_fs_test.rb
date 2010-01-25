@@ -1,4 +1,5 @@
 require 'test_helper'
+
 class CrawlerFsTest < Test::Unit::TestCase
   include TestHelper
 
