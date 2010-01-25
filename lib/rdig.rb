@@ -146,7 +146,8 @@ module RDig
             :analyzer            => Ferret::Analysis::StandardAnalyzer.new,
             :occur_default       => :must,
             :default_field       => '*',
-            :fields              => [ :title, :content ]
+            :fields              => [ :title, :content ],
+            :weightings          => []
           )
         )
       end

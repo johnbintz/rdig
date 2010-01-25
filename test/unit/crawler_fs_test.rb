@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'fileutils'
 
 class CrawlerFsTest < Test::Unit::TestCase
   include TestHelper
@@ -6,7 +7,7 @@ class CrawlerFsTest < Test::Unit::TestCase
   def setup
     @fixture_path = File.expand_path(File.join(File.dirname(__FILE__), '../fixtures/'))
     index_dir = 'tmp/test-index'
-    Dir.mkdir index_dir unless File.directory? index_dir
+    FileUtils.mkdir_p index_dir unless File.directory? index_dir
     RDig.configuration do |cfg|
       @old_crawler_cfg = cfg.crawler.clone
       cfg.crawler.start_urls = [ "file://#{@fixture_path}" ]

@@ -36,12 +36,14 @@ module RDig
           :url   => document.uri.to_s
         }
 
-        document.links.each do |link|
-          if !@url_popularity[link]
-            @url_popularity[link] = 0
-          end
+        if document.links
+          document.links.each do |link|
+            if !@url_popularity[link]
+              @url_popularity[link] = 0
+            end
 
-          @url_popularity[link] += 1
+            @url_popularity[link] += 1
+          end
         end
 
         @config.fields.each do |field|

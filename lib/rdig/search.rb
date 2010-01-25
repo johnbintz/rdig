@@ -5,18 +5,18 @@ module RDig
     # Call RDig::searcher to retrieve an instance ready for use.
     class Searcher
       include Ferret::Search
-      
+
       # the query parser used to parse query strings
       attr_reader :query_parser
-  
+
       # takes the ferret section of the rdig configuration as a parameter.
       def initialize(settings)
         @ferret_config = settings
         @query_parser = Ferret::QueryParser.new(settings.marshal_dump)
         ferret_searcher
       end
-  
-      # returns the Ferret::Search::IndexSearcher instance used internally.    
+
+      # returns the Ferret::Search::IndexSearcher instance used internally.
       def ferret_searcher
         if @ferret_searcher and !@ferret_searcher.reader.latest?
           # reopen searcher
@@ -29,13 +29,13 @@ module RDig
         end
         @ferret_searcher
       end
-  
-      # run a search. 
-      # +query+ usually will be a user-entered string. See the Ferret query 
+
+      # run a search.
+      # +query+ usually will be a user-entered string. See the Ferret query
       # language[http://ferret.davebalmain.com/api/classes/Ferret/QueryParser.html]
       # for more information on queries.
       # A Ferret::Search::Query instance may be given, too.
-      # 
+      #
       # Some of the more often used otions are:
       # offset:: first document in result list to retrieve (0-based). The default is 0.
       # limit:: number of documents to retrieve. The default is 10.
@@ -46,23 +46,24 @@ module RDig
         RDig.logger.info "Query: #{query}"
         results = []
         searcher = ferret_searcher
+
         result[:hitcount] = searcher.search_each(query, options) do |doc_id, score|
           doc = searcher[doc_id]
-          results << { :score => score, 
-                       :title => doc[:title], 
-                       :url => doc[:url], 
+          results << { :score => score,
+                       :title => doc[:title],
+                       :url => doc[:url],
                        :extract => build_extract(doc[:data]) }
         end
         result[:list] = results
         result
       end
-  
+
       def build_extract(data)
-        (data && data.length > 200) ? data[0..200] : data      
+        (data && data.length > 200) ? data[0..200] : data
       end
-  
+
     end
-  
+
   #  class SearchResult < OpenStruct
   #    def initialize(doc, score)
   #      self.score = score
@@ -72,6 +73,6 @@ module RDig
   #    end
   #  end
 
-     
+
   end
 end

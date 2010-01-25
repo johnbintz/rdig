@@ -31,7 +31,4 @@ class SearcherTest < Test::Unit::TestCase
     assert_equal 5, result[:hitcount]
     assert_equal 5, result[:list].size
   end
-
 end
-
-

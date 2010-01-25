@@ -90,7 +90,6 @@ module RDig
       end
       @content ||= {}
     end
-
   end
 
 

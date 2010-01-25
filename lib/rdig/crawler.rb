@@ -69,6 +69,7 @@ module RDig
           doc.content[:links].each { |url|
             add_url(url, filterchain, doc)
           } unless doc.content[:links].nil?
+
           add_to_index doc
         end
       when :redirect
@@ -86,7 +87,6 @@ module RDig
       @indexer << doc if doc.needs_indexing?
     end
 
-
     # pipes a new document pointing to url through the filter chain,
     # if it survives that, it gets added to the documents queue for further
     # processing
@@ -96,10 +96,31 @@ module RDig
       end
       return if url.nil? || url.empty?
 
-      url = follow_redirects(url)
+      try_add = false
 
-      if !@urls_crawled.index(url)
-        begin
+      case URI.parse(url).scheme
+        when 'http'
+          url = follow_redirects(url)
+
+          if !@urls_crawled.index(url)
+            begin
+              @logger.debug "add_url #{url}"
+              doc = if referring_document
+                referring_document.create_child(url)
+              else
+                Document.create(url)
+              end
+
+              if doc.uri.scheme = 'http'
+                if url_in_included_hosts(doc.uri.to_s)
+                  try_add = true
+                end
+              end
+            rescue
+            end
+            @urls_crawled << url
+          end
+        when 'file'
           @logger.debug "add_url #{url}"
           doc = if referring_document
             referring_document.create_child(url)
@@ -107,19 +128,16 @@ module RDig
             Document.create(url)
           end
 
-          if doc.uri.scheme = 'http'
-            if url_in_included_hosts(doc.uri.to_s)
-              doc = filterchain.apply(doc)
+          try_add = true
+      end
 
-              if doc
-                @documents << doc
-                @logger.debug "url #{url} survived filterchain"
-              end
-            end
-          end
-        rescue
+      if try_add
+        doc = filterchain.apply(doc)
+
+        if doc
+          @documents << doc
+          @logger.debug "url #{url} survived filterchain"
         end
-        @urls_crawled << url
       end
     end
 

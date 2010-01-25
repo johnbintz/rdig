@@ -14,7 +14,7 @@ class WordContentExtractorTest < Test::Unit::TestCase
     result = ContentExtractors.process(word_doc('simple'), 'application/msword')
     check_content(result)
   end
-  
+
   def test_simple
     result = @ce.process(word_doc('simple'))
     check_content(result)
@@ -29,6 +29,4 @@ class WordContentExtractorTest < Test::Unit::TestCase
     assert_not_nil result[:content]
     assert_equal 'Test content for Word content extraction. Another paragraph.', result[:content]
   end
-  
 end
-

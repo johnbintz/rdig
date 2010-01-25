@@ -4,4 +4,5 @@ tmp
 pkg
 .project
 coverage
+.loadpath
 

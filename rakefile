@@ -95,7 +95,14 @@ task :test_coverage do
   rm_f 'coverage'
   rm_f 'coverage.data'
   rcov = "rcov -Ilib:test"
-  system("#{rcov} --html test/unit/*_test.rb")
+
+  files = Dir['test/unit/*_test.rb']
+
+  if %x(which wvHtml) == ""
+    files = files.reject { |f| f.match(/word_content/) }
+  end
+
+  system("#{rcov} --html " + files.join(" "))
   system("open coverage/index.html") if PLATFORM['dawrin']
 end
 
@@ -122,7 +129,7 @@ if ! defined?(Gem)
   puts "Package Target requires RubyGEMs"
 else
   spec = Gem::Specification.new do |s|
-    
+
     #### Basic information.
 
     s.name = 'rdig'
@@ -131,7 +138,7 @@ else
     s.description = <<-EOF
     RDig provides an HTTP crawler and content extraction utilities
     to help building a site search for web sites or intranets. Internally,
-    Ferret is used for the full text indexing. After creating a config file 
+    Ferret is used for the full text indexing. After creating a config file
     for your site, the index can be built with a single call to rdig.
     For HTML page crawling, hpricot and rubyful_soup are supported.
     EOF
@@ -236,7 +243,7 @@ task :dbg do
 end
 
 desc "List all ruby files"
-task :rubyfiles do 
+task :rubyfiles do
   puts Dir['**/*.rb'].reject { |fn| fn =~ /^pkg/ }
   puts Dir['bin/*'].reject { |fn| fn =~ /CVS|(~$)|(\.rb$)/ }
 end
@@ -254,23 +261,23 @@ task :release => [
       :update_version,
       :package,
       :tag] do
-  
-  announce 
+
+  announce
   announce "**************************************************************"
   announce "* Release #{PKG_VERSION} Complete."
   announce "* Packages ready to upload."
   announce "**************************************************************"
-  announce 
+  announce
 end
 
 # Validate that everything is ready to go for a release.
 task :prerelease do
-  announce 
+  announce
   announce "**************************************************************"
   announce "* Making RubyGem Release #{PKG_VERSION}"
   announce "* (current version #{CURRENT_VERSION})"
   announce "**************************************************************"
-  announce  
+  announce
 
   # Is a release number supplied?
   unless ENV['REL']
