@@ -98,37 +98,40 @@ module RDig
 
       try_add = false
 
-      case URI.parse(url).scheme
-        when 'http'
-          url = follow_redirects(url)
-
-          if !@urls_crawled.index(url)
-            begin
-              @logger.debug "add_url #{url}"
-              doc = if referring_document
-                referring_document.create_child(url)
-              else
-                Document.create(url)
-              end
-
-              if doc.uri.scheme = 'http'
-                if url_in_included_hosts(doc.uri.to_s)
-                  try_add = true
-                end
-              end
-            rescue
+      begin
+        case URI.parse(url).scheme
+          when 'file'
+            @logger.debug "add_url #{url}"
+            doc = if referring_document
+              referring_document.create_child(url)
+            else
+              Document.create(url)
             end
-            @urls_crawled << url
-          end
-        when 'file'
-          @logger.debug "add_url #{url}"
-          doc = if referring_document
-            referring_document.create_child(url)
-          else
-            Document.create(url)
-          end
 
-          try_add = true
+            try_add = true
+          else
+            url = follow_redirects(url)
+
+            if !@urls_crawled.index(url)
+              begin
+                @logger.debug "add_url #{url}"
+                doc = if referring_document
+                  referring_document.create_child(url)
+                else
+                  Document.create(url)
+                end
+
+                if doc.uri.scheme = 'http'
+                  if url_in_included_hosts(doc.uri.to_s)
+                    try_add = true
+                  end
+                end
+              rescue
+              end
+              @urls_crawled << url
+            end
+        end
+      rescue
       end
 
       if try_add
