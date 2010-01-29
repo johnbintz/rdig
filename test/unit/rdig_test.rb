@@ -1,4 +1,7 @@
 require 'test_helper'
+require 'rubygems'
+require 'mocha'
+
 class RDigTest < Test::Unit::TestCase
   include TestHelper
 
