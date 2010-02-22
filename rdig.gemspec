@@ -2,10 +2,10 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rdig}
-  s.version = "0.3.8"
+  s.version = "0.4.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
-  s.authors = ["Jens Kraemer"]
+  s.authors = ["Jens Kraemer","John Bintz"]
   s.date = %q{2009-04-26}
   s.description = %q{Website crawler and fulltext indexer.}
   s.email = %q{jk@jkraemer.net}
@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
     lib/rdig.rb
   )
   s.has_rdoc = true
-  s.homepage = %q{ http://github.com/jkraemer/rdig/ }
+  s.homepage = %q{ http://github.com/johnbintz/rdig/ }
   s.rdoc_options = ["--main", "README"]
   s.require_paths = ["lib"]
   s.rubyforge_project = %q{rdig}
