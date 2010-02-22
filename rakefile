@@ -76,7 +76,13 @@ Rake::TestTask.new("test_all") { |t|
 
 # Run unit tests
 Rake::TestTask.new("test_units") { |t|
-  t.test_files = FileList[ 'test/unit/*_test.rb' ]
+  files = Dir['test/unit/*_test.rb']
+
+  if %x(which wvHtml) == ""
+    files = files.reject { |f| f.match(/word_content/) }
+  end
+
+  t.test_files = files
   t.libs << "test"
   #t.warning = true
   t.verbose = true
