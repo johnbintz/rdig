@@ -54,6 +54,10 @@ module RDig
           (doc/tag).map do |tag|
             value = tag[attr]
             CGI.unescapeHTML(value) if value && value !~ /^#/
+           	if @config.link_filter
+           		value = @config.link_filter.call(value)
+           	end
+           	value
           end
         end.flatten.compact
       end
