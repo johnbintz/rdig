@@ -41,6 +41,7 @@ require 'tempfile'
 require 'open-uri'
 require 'logger'
 require 'base64'
+require 'strscan'
 
 begin
   require 'ferret'
