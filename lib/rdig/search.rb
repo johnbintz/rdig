@@ -40,9 +40,15 @@ module RDig
       # offset:: first document in result list to retrieve (0-based). The default is 0.
       # limit:: number of documents to retrieve. The default is 10.
       # Please see the Ferret::Search::Searcher API for more options.
-      def search(query, options={})
+      # +advanced_extract+ when set to false will simply return first 200 characters
+      # of the data, when set to true will iterate through the document matches and
+      # return a small extract before and after the query
+      def search(query, advanced_extract=false, options={})
         result = {}
-        str_query = query
+        if advanced_extract
+          str_query = query
+        end
+        
         query = query_parser.parse(query) if query.is_a?(String)
         RDig.logger.info "Query: #{query}"
         results = []
@@ -50,9 +56,9 @@ module RDig
         result[:hitcount] = searcher.search_each(query, options) do |doc_id, score|
           doc = searcher[doc_id]
           results << { :score => score, 
-                       :title => doc[:title], 
-                       :url => doc[:url], 
-                       :extract => build_extract(doc[:data], str_query) }
+            :title => doc[:title],
+            :url => doc[:url],
+            :extract => build_extract(doc[:data], str_query) }
         end
         result[:list] = results
         result
@@ -67,27 +73,27 @@ module RDig
           while !scannable_data.scan_until(/#{query}/i).nil?
             extract << get_extract_before_and_after(scannable_data, query, 15)
           end
+          extract.join('...')
         end
-        extract.join('...')
       end
 
       def get_extract_before_and_after(data, query, words)
-          data_before_match = data.pre_match.split
-          words_before = []
-          words.times { |w| words_before << data_before_match.pop }
-          extract_before = words_before.compact.reverse.join(' ')
-          "#{extract_before} #{data.matched} #{data.scan(/(\w+| ){1,#{words}}/)}"
+        data_before_match = data.pre_match.split
+        words_before = []
+        words.times { |w| words_before << data_before_match.pop }
+        extract_before = words_before.compact.reverse.join(' ')
+        "#{extract_before} #{data.matched} #{data.scan(/(\w+| ){1,#{words}}/)}"
       end
      
     end
-  #  class SearchResult < OpenStruct
-  #    def initialize(doc, score)
-  #      self.score = score
-  #      self.title = doc[:title]
-  #      self.url = doc[:url]
-  #      self.extract = doc[:content][0..200]
-  #    end
-  #  end
+    #  class SearchResult < OpenStruct
+    #    def initialize(doc, score)
+    #      self.score = score
+    #      self.title = doc[:title]
+    #      self.url = doc[:url]
+    #      self.extract = doc[:content][0..200]
+    #    end
+    #  end
 
      
   end
