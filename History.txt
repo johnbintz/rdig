@@ -1,3 +1,6 @@
+== 0.4.0 2010-03-01
+* Improved content extraction while maintaining backward compatibility
+
 == 0.3.8 2009-04-26
 
 * bump up version

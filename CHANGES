@@ -1,3 +1,6 @@
+0.4.0
+- improved extract building but maintain backward compatibility
+
 0.3.6
 - remove bundled htmlentities in favor of a gem dependency
 - also extract links from area and frame tags
