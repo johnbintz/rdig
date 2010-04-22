@@ -137,7 +137,8 @@ module RDig
               :content_tag_selector => 'body'
               # might also be a proc returning either an element or a string:
               # :content_tag_selector => lambda { |hpricot_doc| ... }
-            )
+            ),
+            :pdf => OpenStruct.new()
           ),
           :index                 => OpenStruct.new(
             :path                => "index/",

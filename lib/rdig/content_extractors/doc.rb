@@ -22,7 +22,7 @@ module RDig
         @available = %x{#{@wvhtml} -h 2>&1} =~ /Dom Lachowicz/
       end
       
-      def process(content)
+      def process(content, default_title = nil)
         result = {}
         as_file(content) do |file|  
           result = @html_extractor.process(%x{#{@wvhtml} --charset=UTF-8 '#{file.path}' -})

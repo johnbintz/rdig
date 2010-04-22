@@ -10,24 +10,30 @@ module RDig
       include ExternalAppHelper
       
       def initialize(config)
-        super(config)
+        super(config.pdf)
         @pattern = /^application\/pdf/
-        @pdftotext = 'pdftotext'
-        @pdfinfo = 'pdfinfo'
+        
         @available = true
-        [ @pdftotext, @pdfinfo].each { |program|
-          unless %x{#{program} -h 2>&1} =~ /Copyright 1996/ 
+        
+        %w{pdftotext pdfinfo}.each do |program|
+          if config.pdf_tools_path
+            program = "#{config.pdf_tools_path}#{program}"
+          end
+          
+          if %x{#{program} -h 2>&1} =~ /Copyright 1996/ 
+            instance_variable_set("@#{program}".to_sym, program)
+          else
             @available = false 
             break
           end
-        }
+        end
       end
  
-      def process(content)
+      def process(content, default_title = nil)
         result = {}
         as_file(content) do |file|
           result[:content] = get_content(file.path).strip
-          result[:title] = get_title(file.path)
+          result[:title] = get_title(file.path) || default_title
         end
         result
       end

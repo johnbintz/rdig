@@ -19,7 +19,7 @@ module RDig
         @pattern = /^(text\/(html|xml)|application\/(xhtml\+xml|xml))/ if config.hpricot
       end
 
-      def process(content)
+      def process(content, default_title = nil)
         doc = Hpricot(content)
 
         ret = {}
@@ -42,6 +42,10 @@ module RDig
         methods.find_all { |m| m[/^extract_/] }.each do |method|
           tag = method.gsub('extract_', '').to_sym
           ret[tag] = send(method.to_sym, doc)
+        end
+
+        if !ret[:title]
+          ret[:title] = default_title
         end
 
         ret

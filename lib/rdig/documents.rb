@@ -135,7 +135,7 @@ module RDig
           case doc.status.first.to_i
           when 200
             @etag = doc.meta['etag']
-            @content = ContentExtractors.process(doc.read, doc.content_type)
+            @content = ContentExtractors.process(doc.read, doc.content_type, @uri.to_s)
             @status = :success
           when 404
             RDig.logger.info "got 404 for #{@uri}"

@@ -5,8 +5,8 @@ module RDig
   module ContentExtractors
 
     # process the given +content+ depending on it's +content_type+.
-    def self.process(content, content_type)
-      ContentExtractor.process(content, content_type)
+    def self.process(content, content_type, default_title = nil)
+      ContentExtractor.process(content, content_type, default_title)
     end
 
     # Base class for Content Extractors.
@@ -33,9 +33,9 @@ module RDig
         }.compact
       end
 
-      def self.process(content, content_type)
+      def self.process(content, content_type, default_title = nil)
         self.extractor_instances.each { |extractor|
-          return extractor.process(content) if extractor.can_do(content_type)
+          return extractor.process(content, default_title) if extractor.can_do(content_type)
         }
         puts "unable to handle content type #{content_type}"
       end
@@ -54,10 +54,11 @@ module RDig
     # that takes a path to a file and return the textual content extracted from
     # that file.
     module ExternalAppHelper
-      def process(content)
+      def process(content, default_title = nil)
         result = {}
         as_file(content) do |file|
           result[:content] = get_content(file.path).strip
+          result[:title] = default_title
         end
         result
       end
