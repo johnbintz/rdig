@@ -33,7 +33,8 @@ module RDig
         @config.rewrite_uri.call(document.uri) if @config.rewrite_uri
         # all stored and tokenized, should be ferret defaults
         doc = {
-          :url   => document.uri.to_s
+          :url   => document.uri.to_s,
+          :path  => document.uri.path
         }
 
         if document.links
@@ -57,25 +58,28 @@ module RDig
       alias :<< :add_to_index
 
       def close
+        RDig.logger.debug "calculating boosts..."
         synchronize do
           (0...@index.size()).each do |i|
             doc = @index[i].load
             total_boost = 0
             @url_popularity.each do |link, boost|
               if doc[:url][link]
-                total_boost += boost
+                total_boost += (boost / 100)
               end
             end
 
-            if total_boost > 0
-              d = Ferret::Document.new(total_boost)
-              doc.keys.each do |k|
-                d[k] = doc[k]
-              end
-
-              @index.delete i
-              @index << d
+            @config.boosts.each do |regexp, boost|
+              total_boost += boost if (doc[:url][regexp])
             end
+
+            d = Ferret::Document.new(total_boost)
+            doc.keys.each do |k|
+              d[k] = doc[k]
+            end
+
+            @index.delete i
+            @index << d
           end
         end
 
