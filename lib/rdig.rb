@@ -3,6 +3,7 @@
 #--
 # Copyright (c) 2006 Jens Kraemer
 # Copyright (c) 2010 John Bintz
+# Copyright (c) 2010 Sean Kilber
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -42,6 +43,7 @@ require 'tempfile'
 require 'open-uri'
 require 'logger'
 require 'base64'
+require 'strscan'
 
 begin
   require 'ferret'

@@ -1,6 +1,7 @@
-== 0.4.0 2010-01-25
+== 0.4.0 2010-03-01
 
 * Updates to crawling
+* Improved content extraction while maintaining backward compatibility
 
 == 0.3.8 2009-04-26
 

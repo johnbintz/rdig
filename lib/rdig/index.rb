@@ -69,8 +69,10 @@ module RDig
               end
             end
 
-            @config.boosts.each do |regexp, boost|
-              total_boost += boost if (doc[:url][regexp])
+            if @config.boosts
+              @config.boosts.each do |regexp, boost|
+                total_boost += boost if (doc[:url][regexp])
+              end
             end
 
             d = Ferret::Document.new(total_boost)
